@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task</title>
+</head>
+<body>
+    {% block content %}
+
+    {% for task in tasks %}
+      <p>  <li>Name : {{task.Name}}</li>
+        <li>Post : {{task.Post}}</li>
+        <li>Contact : {{task.Contact}}</li>
+        <li>Email : {{task.Email}}</li>
+        <li>ID : {{task.id}}</li>
+        <a href="{% url 'task_update' task.pk %}">Update</a>
+        <a href="{% url 'task_delete' task.pk %}" 
+        onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+      </p>
+    
+    {% endfor %}
+    <h4><a href="{% url 'task_form' %}">Create Task</a><h4>
+      <a href="{% url 'logout' %}">Logout</a>
+    </body>
+    {% endblock %}
+    
+</html>
