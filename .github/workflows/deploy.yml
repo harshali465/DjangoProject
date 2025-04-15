@@ -40,7 +40,7 @@ jobs:
         script: |
           cd /home/ubuntu/myproject/
           source venv/bin/activate
-          cd /home/ubuntu/myproject/DjangoProject
+          cd DjangoProject
           git stash || true
           git pull origin main 
           pip install -r requirements.txt
