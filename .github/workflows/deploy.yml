@@ -22,6 +22,7 @@ jobs:
           script: |
             cd /home/ubuntu/myproject/           # your project directory on EC2
             source venv/bin/activate             # activate virtual environment
+            cd DjangoProject
             git pull origin main                 # pull latest code
             pip install -r requirements.txt      # install dependencies
             python manage.py migrate             # apply migrations
