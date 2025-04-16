@@ -29,10 +29,9 @@ jobs:
             cd DjangoProject
 
             echo "Pulling latest code from GitHub..."
-            # git fetch origin
-            # git reset --hard origin/main
-            git pull origin main 
             
+            git pull origin main 
+
             echo "Installing dependencies..."
             pip install -r requirements.txt
 
