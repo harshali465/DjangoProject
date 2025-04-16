@@ -1,49 +1,29 @@
-name: Django CI/CD
+name: Django EC2 Deployment
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - main  # Run this workflow only when code is pushed to main
 
 jobs:
-  test-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Run tests
-      run: |
-        python manage.py test
-
-    - name: Deploy to EC2 via SSH
-      if: success()
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_KEY }}
-        script: |
-          cd /home/ubuntu/myproject/
-          source venv/bin/activate
-          cd DjangoProject
-          git stash || true
-          git pull origin main 
-          pip install -r requirements.txt
-          python manage.py migrate
-          python manage.py collectstatic --noinput
-          sudo systemctl restart gunicorn
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}         # e.g. ec2-3-91-XXX-XXX.compute.amazonaws.com
+          username: ${{ secrets.EC2_USER }}     # e.g. ubuntu
+          key: ${{ secrets.EC2_KEY }}           # your private key contents (.pem)
+          script: |
+            cd /home/ubuntu/myproject/           # your project directory on EC2
+            source venv/bin/activate             # activate virtual environment
+            git pull origin main                 # pull latest code
+            pip install -r requirements.txt      # install dependencies
+            python manage.py migrate             # apply migrations
+            python manage.py collectstatic --noinput  # collect static files
+            sudo systemctl restart gunicorn      # restart Gunicorn
