@@ -3,7 +3,7 @@ name: Django EC2 Deployment
 on:
   push:
     branches:
-      - main  # Run this workflow only when code is pushed to main
+      - main
 
 jobs:
   deploy:
@@ -16,18 +16,68 @@ jobs:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}         # e.g. ec2-3-91-XXX-XXX.compute.amazonaws.com
-          username: ${{ secrets.EC2_USER }}     # e.g. ubuntu
-          key: ${{ secrets.EC2_KEY }}           # your private key contents (.pem)
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
           script: |
-            cd /home/ubuntu/myproject/           # your project directory on EC2
-            source venv/bin/activate             # activate virtual environment
+            echo "Navigating to project directory..."
+            cd /home/ubuntu/myproject/
+            echo "Activating virtual environment..."
+            source venv/bin/activate
+
+            echo "Navigating to DjangoProject folder..."
             cd DjangoProject
+
+            echo "Pulling latest code from GitHub..."
             git fetch origin
-            git reset --hard origin/main     # Force sync with remote
-            # git config pull.rebase false       # Set default pull behavior
-            # git pull origin main                 # pull latest code
-            pip install -r requirements.txt      # install dependencies
-            python manage.py migrate             # apply migrations
-            python manage.py collectstatic --noinput  # collect static files
-            sudo systemctl restart gunicorn      # restart Gunicorn
+            git reset --hard origin/main
+
+            echo "Installing dependencies..."
+            pip install -r requirements.txt
+
+            echo "Applying migrations..."
+            python manage.py migrate
+
+            echo "Collecting static files..."
+            python manage.py collectstatic --noinput
+
+            echo "Restarting Gunicorn..."
+            sudo systemctl restart gunicorn
+
+            echo "✅ Deployment finished"
+
+
+
+# name: Django EC2 Deployment
+
+# on:
+#   push:
+#     branches:
+#       - main  # Run this workflow only when code is pushed to main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Deploy to EC2 via SSH
+#         uses: appleboy/ssh-action@v1.0.0
+#         with:
+#           host: ${{ secrets.EC2_HOST }}         # e.g. ec2-3-91-XXX-XXX.compute.amazonaws.com
+#           username: ${{ secrets.EC2_USER }}     # e.g. ubuntu
+#           key: ${{ secrets.EC2_KEY }}           # your private key contents (.pem)
+#           script: |
+#             cd /home/ubuntu/myproject/           # your project directory on EC2
+#             source venv/bin/activate             # activate virtual environment
+#             cd DjangoProject
+#             git fetch origin
+#             git reset --hard origin/main     # Force sync with remote
+#             # git config pull.rebase false       # Set default pull behavior
+#             # git pull origin main                 # pull latest code
+#             pip install -r requirements.txt      # install dependencies
+#             python manage.py migrate             # apply migrations
+#             python manage.py collectstatic --noinput  # collect static files
+#             sudo systemctl restart gunicorn      # restart Gunicorn
